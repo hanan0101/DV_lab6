@@ -63,19 +63,24 @@ module alu_test(
       bins default_bin = default; 
     }
 
-    // Coverpoint for result
-    result_cp: coverpoint op2 {
+    // Coverpoint for result 
+    result_cp: coverpoint alu_result {
+      bins zero = {32'h00000000};
       bins low_range = {[32'h00000001: 32'h000000FF]};  // Covers low range
       bins high_range = {[32'hFFFFFF00: 32'hFFFFFFFF]}; // Covers high range
       bins default_bin = default; 
     }
 
      alu_ctrl_cp: coverpoint alu_ctrl {
-            bins range_0_15 = {[4'b0000: 4'b1111]}; // Covers all possible values from 0000 to 1111
-
+            //bins range_0_15 = {[4'b0000:4'b1000],4'b1101}; // Covers all possible values from 0000 to 1111
+            bins range_0_15 = {[4'b0000:4'b1111]};
             // Default bin for any other value not covered by the above
             bins default_bin = default;
         }
+
+     opcode: cross alu_ctrl_cp, op1_cp, op2_cp;      
+     result_contrl: cross alu_ctrl_cp, result_cp;
+
   endgroup  
 
 
@@ -91,7 +96,7 @@ module alu_test(
     // Test Cases Here 
     initial begin 
         rtrans = new();
-        repeat(100) begin 
+        repeat(1000) begin 
             ok = rtrans.randomize() with {
                 a inside {[0:255], [32'hFFFFFF00: 32'hFFFFFFFF]};
                 b inside {[0:255], [32'hFFFFFF00: 32'hFFFFFFFF]};
